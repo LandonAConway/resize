@@ -10,11 +10,14 @@ minetest.register_chatcommand("restore_size", {
         privs = {set_size=true},
         func = function(name, text)
 			local player = minetest.get_player_by_name(name)
-			for _, _player in ipairs(minetest.get_connected_players()) do
-				if _player:get_player_name() == text then
-					resize_mod.restore(_player)
-					return true, "Size set to normal."
+			if text ~= nil and text ~= "" then
+				for _, _player in ipairs(minetest.get_connected_players()) do
+					if _player:get_player_name() == text then
+						resize_mod.restore(_player)
+						return true, "Size set to normal."
+					end
 				end
+				return false, "'"..text.."' is not online or does not exist."
 			end
 			resize_mod.restore(player)
 			return true, "Size set to normal."
@@ -37,7 +40,7 @@ minetest.register_chatcommand("set_size", {
 						if _player:get_player_name() == split_str[1] then
 							if split_str[2] ~= nil and split_str ~= "" then
 								if tonumber(split_str[2]) then
-									resize_mod.restore(_player)
+									resize_mod.set_size(_player)
 									return true, "Size set to "..split_str[2].."."
 								end
 								return false, "'"..split_str[2].."' is not a valid number."
