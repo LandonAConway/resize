@@ -5,27 +5,50 @@ minetest.register_privilege("set_size", {
 })
 
 minetest.register_chatcommand("restore_size", {
-        params = "",
+        params = "<player>",
         description = "Restores players size",
         privs = {set_size=true},
-        func = function(name)
-          local player = minetest.get_player_by_name(name)
-          resize_mod.restore(player)
-          return true, "Size set to normal."
+        func = function(name, text)
+			local player = minetest.get_player_by_name(name)
+			for _, _player in ipairs(minetest.get_connected_players()) do
+				if _player:get_player_name() == text then
+					resize_mod.restore(_player)
+					return true, "Size set to normal."
+				end
+			end
+			resize_mod.restore(player)
+			return true, "Size set to normal."
         end
 })
 
 minetest.register_chatcommand("set_size", {
-        params = "<size>",
+        params = "<player> <size>",
         description = "Set players size",
         privs = {set_size=true},
         func = function(name, text)
-          if tonumber(text) then
-            local player = minetest.get_player_by_name(name)
-            resize_mod.set_size(player, tonumber(text))
-            return true, "Size set to '"..text.."'."
-          end
-          return false, "'"..text.."' is not a valid number."
+			if tonumber(text) then
+				local player = minetest.get_player_by_name(name)
+				resize_mod.set_size(player, tonumber(text))
+				return true, "Size set to '"..text.."'."
+			else
+				local split_str = resize_mod.split_string(text, " ")
+				if split_str[1] ~= nil and split_str[1] ~= "" then
+					for _, _player in ipairs(minetest.get_connected_players()) do
+						if _player:get_player_name() == split_str[1] then
+							if split_str[2] ~= nil and split_str ~= "" then
+								if tonumber(split_str[2]) then
+									resize_mod.restore(_player)
+									return true, "Size set to "..split_str[2].."."
+								end
+								return false, "'"..split_str[2].."' is not a valid number."
+							end
+							return false, "Please enter a number."
+						end
+					end
+					return false, "'"..split_str[1].."' is not online or does not exist."
+				end
+				return false, "Please enter a player name or a number."
+			end
         end
 })
 
@@ -56,4 +79,21 @@ function resize_mod.set_size(player, size)
   }
   player:set_properties(prop)
   player:set_physics_override({jump=size})
+end
+
+function resize_mod.split_string(inputstr, sep)
+	if sep == nil then
+		sep = "%s"
+	end
+	
+	local t = {}
+	if string.find(inputstr, sep) then
+		for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
+			table.insert(t, str)
+		end
+	else
+		table.insert(t, inputstr)
+	end
+	
+	return t
 end
