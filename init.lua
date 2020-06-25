@@ -40,7 +40,7 @@ minetest.register_chatcommand("set_size", {
 						if _player:get_player_name() == split_str[1] then
 							if split_str[2] ~= nil and split_str ~= "" then
 								if tonumber(split_str[2]) then
-									resize_mod.set_size(_player)
+									resize_mod.set_size(_player, tonumber(split_str[2]))
 									return true, "Size set to "..split_str[2].."."
 								end
 								return false, "'"..split_str[2].."' is not a valid number."
