@@ -3,7 +3,7 @@ Resize v1.0
 
 DESCRIPTION
 ==============================
-Adds power rangers to Minetest. It requires the 3d Armor mod.
+Adds the ability to reset the size of a player.
 
 
 LICENSE
