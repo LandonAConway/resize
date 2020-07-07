@@ -57,11 +57,6 @@ minetest.register_chatcommand("set_size", {
 
 function resize_mod.restore(player)
   local properties = player:get_properties()
---  minetest.log("collisionbox = {"..table.concat(properties["collisionbox"], ", ").."},"..
---  "selectionbox = {"..table.concat(properties["selectionbox"], ", ").."},"..
---  "visual_size = {x="..properties["visual_size"].x..",y="..properties["visual_size"].y..",z="..properties["visual_size"].z.."},"..
---  "eye_height = "..properties["eye_height"]
---  )
   local prop = {
     visual_size = {x=1,y=1,z=1},
     eye_height = 1.4700000286102,
@@ -70,6 +65,21 @@ function resize_mod.restore(player)
   }
   player:set_properties(prop)
   player:set_physics_override({jump=1})
+  
+  --hand
+  local inv = player:get_inventory()
+  local stack = inv:get_stack("hand", 1)
+  local meta = stack:get_meta()
+  local tool_capabilities = stack:get_tool_capabilities()
+  local range = resize_mod.get_range(player:get_player_name())
+  
+--  minetest.override_item("", {
+--    range = range,
+--    tool_capabilities = tool_capabilities
+--  })
+
+  --meta:set_tool_capabilities(nil)
+  --inv:set_stack("hand", 1, stack)
 end
 
 function resize_mod.set_size(player, size)
@@ -82,6 +92,27 @@ function resize_mod.set_size(player, size)
   }
   player:set_properties(prop)
   player:set_physics_override({jump=size})
+  
+  --hand
+  local inv = player:get_inventory()
+  local stack = inv:get_stack("hand", 1)
+  local meta = stack:get_meta()
+  local tool_capabilities = stack:get_tool_capabilities()
+  local range = resize_mod.get_range(player:get_player_name())
+  
+--  minetest.override_item("", {
+--    range = range*(size),
+--    tool_capabilities = tool_capabilities
+--  })
+  --meta:set_tool_capabilities(tool_capabilities)
+  --inv:set_stack("hand", 1, stack)
+end
+
+function resize_mod.get_range(player)
+  if creative.is_enabled_for(player) then
+    return 10
+  end
+  return 4
 end
 
 function resize_mod.split_string(inputstr, sep)
